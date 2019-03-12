@@ -94,8 +94,10 @@ int		check_valid(char *str)
 	while (str[i] && str[i] != ' ' && ft_isdigit(str[i]))
 		i++;
 	i = str[++i] && (str[i] == '-' || str[i] == '+') ? i + 1 : i;
+	printf("|%s| - %d\n", str, i);
 	if (!str[i] || (str[i] && !ft_isdigit(str[i])))
 		return (0);
+	printf("11111\n");
 	while (str[i] && ft_isdigit(str[i]))
 		i++;
 	if (str[i] != '\0')
@@ -148,19 +150,16 @@ int		parcer(t_data *data, t_room *room)
 	while (get_next_line(0, &str))
 	{
 		printf("      |%s|\n", str);
-		if (((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
-			!start_end(&data, room, str, &index)))
+		if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
+			!start_end(&data, room, str, &index))
 			break ;
-		else if (check_valid(str))
-		{
-			if (!create_room(&room, str, &index))
-				break ;
-		}
+		else if (!check_valid(str) || !create_room(&room, str, &index))
+			break ;
 		printf("   ??%s??\n", str);
 		ft_strdel(&str);
 	}
 	ft_strdel(&str);
-	printf("%s %s\n", data->end, data->start);
+	printf("start = %s, end = %s\n", data->start, data->end);
 	if (data->end != NULL && data->start != NULL)
 		return (1);
 	return (0);
