@@ -20,6 +20,7 @@ void	reset(t_data *data)
 	data->room->ants = 0;
 	data->room->coord_x = 0;
 	data->room->coord_y = 0;
+	data->count_room = 0;
 	data->ants_count = 0;
 	data->start = NULL;
 	data->end = NULL;
@@ -153,31 +154,50 @@ int		room_or_link(t_room **r, char *str)
 	return (0);
 }
 
+void	creare_tabl(t_data *data, int index)
+{
+	int		n;
+	int		i;
 
+	data->count_room = index;
+	n = data->count_room;
+	data->links = (char **)malloc(sizeof(char *) * (n + 1));
+	data->links[n] = NULL;
+	i = 0;
+	while (i < n)
+	{
+		data->links[i] = ft_memalloc(n + 1);
+		ft_memset(data->links[i], '0', n);
+		i++;
+	}
+}
 
-// int		links(t_room **r, char *str)
-// {
-// 	t_room	**room1;
-// 	t_room	**room2;
-// 	char	*link1;
-// 	char	*link2;
+int		links(t_data *data, t_room **r, char *str)
+{
+	t_room	**room1;
+	t_room	**room2;
+	char	*link1;
+	char	*link2;
 
-// 	room1 = r;
-// 	link1 = ft_strndup(str, '-');
-// 	while ((*room1) && (*room1)->name != link)
-// 		room1 = &(*room1)->next;
-// 	if ((*room1)->name == link)
-// 	{
-// 		room2 = r;
-// 		link2 = ft_strdup(ft_strchr(str, '-') + 1);
-// 		while ((*room2) && (*room2)->link2)
-// 			room2 = &(*room2)->next;
-// 		if ((*room2)->name = link2)
-// 		{
-
-// 		}
-// 	}
-// }
+	room1 = r;
+	link1 = ft_strndup(str, '-');
+	while ((*room1) && ft_strcmp((*room1)->name, link1))
+		room1 = &(*room1)->next;
+	if ((*room1) && !ft_strcmp((*room1)->name, link1))
+	{
+		room2 = r;
+		link2 = ft_strdup(ft_strchr(str, '-') + 1);
+		while ((*room2) && ft_strcmp((*room2)->name, link2))
+			room2 = &(*room2)->next;
+		if ((*room2) && !ft_strcmp((*room2)->name, link2))
+		{
+			data->links[(*room2)->index][(*room1)->index] = '1';
+			data->links[(*room1)->index][(*room2)->index] = '1';
+			return (1);
+		}
+	}
+	return (0);
+}
 
 int		parcer(t_data *data)
 {
@@ -186,25 +206,29 @@ int		parcer(t_data *data)
 
 	str = NULL;
 	index = 0;
-	if (!ants_count(data))
-		return (0);
-	while (get_next_line(0, &str))
+	while (get_next_line(0, &str) && !room_or_link(&data->room, str))
 	{
-		if (!room_or_link(&data->room, str) && (!ft_strcmp(str, "##start") ||
-			!ft_strcmp(str, "##end")) && !start_end(data, str, &index))
+		if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
+			!start_end(data, str, &index))
 			break ;
-		else if (!room_or_link(&(data->room), str) && (ft_strcmp(str, "##start") &&
-			ft_strcmp(str, "##end")) && (!check_valid(str) || !create_room(&(data->room), str, &index)))
+		else if ((ft_strcmp(str, "##start") && ft_strcmp(str, "##end")) &&
+			(!check_valid(str) || !create_room(&(data->room), str, &index)))
 			break ;
-		// else if (room_or_link(&room, str) && create_tabl(data) && !links(&room, str))
-		// 	break ;
 		ft_strdel(&str);
 	}
-	ft_strdel(&str);
-	printf("start = %s, end = %s\n", data->start, data->end);
-	if (data->end != NULL && data->start != NULL)
-		return (1);
-	return (0);
+	creare_tabl(data, index);
+	while (str && room_or_link(&data->room, str) && links(data, &(data->room), str))
+	{
+		ft_strdel(&str);
+		printf("links\n");
+		get_next_line(0, &str);
+	}
+	int i = 0;
+	while (data->links[i])
+		printf("|%s|\n", data->links[i++]);
+	if (data->end == NULL || data->start == NULL || str != NULL)
+		return (0);
+	return (1);
 }
 
 int		main(void)
@@ -214,8 +238,13 @@ int		main(void)
 	data = (t_data *)malloc(sizeof(t_data));
 	data->room = (t_room *)malloc(sizeof(t_room));
 	reset(data);
-	if (!parcer(data))
-		printf("\033[91mERROR\033[0m\n");
+	if (ants_count(data))
+	{
+		if (!parcer(data))
+			printf("\033[91mERROR\033[0m\n");
+		else
+			printf("\033[92mHAKEY\033[0m\n");
+	}
 	else
 		printf("\033[92mHAKEY\033[0m\n");
 	return (0);

@@ -26,7 +26,7 @@ all: $(NAME)
 $(NAME): $(OB)
 	@make -C lib
 	@gcc $(FLAGS) $(SRC) -o $(NAME) $(LIB)
-	@echo "\033[92m>>>lem_in done<<\033[0m"
+	@echo "\033[95m>>>lem_in done<<\033[0m"
 
 %.o : %.c
 	@gcc $(FLAGS) -c -o  $@ $<
