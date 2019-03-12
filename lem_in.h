@@ -19,7 +19,6 @@
 typedef struct		s_room
 {
 	char			*name;
-	int				*links;
 	int				index;
 	int				ants;
 	int				coord_x;
@@ -29,9 +28,11 @@ typedef struct		s_room
 
 typedef struct		s_data
 {
+	int				**links;
 	int				ants_count;
 	char			*start;
 	char			*end;
+	struct s_room	*room;
 }					t_data;
 
 #endif

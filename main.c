@@ -12,14 +12,14 @@
 
 #include "lem_in.h"
 
-void	reset(t_data *data, t_room *room)
+void	reset(t_data *data)
 {
-	room->next = NULL;
-	room->name = NULL;
-	room->index = 0;
-	room->ants = 0;
-	room->coord_x = 0;
-	room->coord_y = 0;
+	data->room->next = NULL;
+	data->room->name = NULL;
+	data->room->index = 0;
+	data->room->ants = 0;
+	data->room->coord_x = 0;
+	data->room->coord_y = 0;
 	data->ants_count = 0;
 	data->start = NULL;
 	data->end = NULL;
@@ -49,34 +49,34 @@ int		ants_count(t_data *data)
 
 int		create_room(t_room **r, char *str, int *index)
 {
-	int		i;
 	int		x;
 	int		y;
+	char	*name;
 	t_room	**room;
 
+	printf("\ncreate_room start|%s|\n", str);
 	room = r;
-	i = 0;
 	x = ft_atoi(ft_strchr(str, ' '));
 	y = ft_atoi(ft_strchr((ft_strchr(str, ' ') + 1), ' '));
-	printf("->%s - %d - %d\n", str, x, y);
-	printf("index = %d\n", (*index));
+	name = ft_strndup(str, ' ');
 	while ((*index) > 0 && (*room) && ((*room)->coord_x != x ||
-		(*room)->coord_y != y))
+		(*room)->coord_y != y) && ft_strcmp((*room)->name, name))
 	{
-		printf("-->%s - %d\n", (*room)->name, (*room)->index);
+		printf("	room->%s - %d\n", (*room)->name, (*room)->index);
 		room = &(*room)->next;
 	}
-	if ((*index) > 0 && (*room))
+	if (((*index) > 0 && (*room)))
 		return (0);
 	*room = (t_room *)malloc(sizeof(t_room));
-	(*room)->name = ft_strndup(str, ' ');
-	printf(">%s<\n", str);
+	(*room)->name = name;
+	printf("	new_room->%s\n", (*room)->name);
 	(*room)->next = NULL;
 	(*room)->coord_x = x;
 	(*room)->coord_y = y;
 	(*room)->index = (*index);
 	(*room)->ants = 0;
 	(*index)++;
+	printf("create_room end\n");
 	return (1);
 }
 
@@ -85,7 +85,7 @@ int		check_valid(char *str)
 	int		i;
 
 	i = 0;
-	printf("check_valid - %s\n", str);
+	printf("\ncheck_valid start->|%s|\n", str);
 	while (str[i] && str[i] != ' ')
 		i++;
 	i = str[++i] && (str[i] == '-' || str[i] == '+') ? i + 1 : i;
@@ -94,10 +94,8 @@ int		check_valid(char *str)
 	while (str[i] && str[i] != ' ' && ft_isdigit(str[i]))
 		i++;
 	i = str[++i] && (str[i] == '-' || str[i] == '+') ? i + 1 : i;
-	printf("|%s| - %d\n", str, i);
 	if (!str[i] || (str[i] && !ft_isdigit(str[i])))
 		return (0);
-	printf("11111\n");
 	while (str[i] && ft_isdigit(str[i]))
 		i++;
 	if (str[i] != '\0')
@@ -105,43 +103,86 @@ int		check_valid(char *str)
 	return (1);
 }
 
-int		start_end(t_data **data, t_room *room, char *str, int *index)
+int		start_end(t_data *data, char *str, int *index)
 {
 	char	*tmp;
 	int		i;
 
 	tmp = NULL;
 	i = 0;
-	printf("?%s?\n", str);
+	printf("\n'start_end' start->|%s|\n", str);
 	if (get_next_line(0, &tmp) && check_valid(tmp) &&
-		create_room(&room, tmp, index))
+		create_room(&(data->room), tmp, index))
 	{
-		printf("!%s!\n", tmp);
-		if ((!ft_strcmp(str, "##start") && (*data)->start != NULL) ||
-			(!ft_strcmp(str, "##end") && (*data)->end != NULL))
+		printf("	tmp = |%s|\n", tmp);
+		if ((!ft_strcmp(str, "##start") && (data)->start != NULL) ||
+			(!ft_strcmp(str, "##end") && (data)->end != NULL))
 		{
-			(*data)->end = NULL;
-			(*data)->start = NULL;
+			(data)->end = NULL;
+			(data)->start = NULL;
 			return (0); 
 		}
 		if ((!ft_strcmp(str, "##start")))
-			(*data)->start = ft_strndup(tmp, ' ');
+			(data)->start = ft_strndup(tmp, ' ');
 		if ((!ft_strcmp(str, "##end")))
-			(*data)->end = ft_strndup(tmp, ' ');
-		printf("%s!\n", tmp);
+			(data)->end = ft_strndup(tmp, ' ');
 		ft_strdel(&tmp);
 		return (1);
 	}
-	(*data)->end = NULL;
-	(*data)->start = NULL;
+	(data)->end = NULL;
+	(data)->start = NULL;
 	return (0);
 }
 
-int		parcer(t_data *data, t_room *room)
+int		room_or_link(t_room **r, char *str)
+{
+	t_room	**room;
+	char	*room_name;
+
+	if (ft_strchr(str, '-'))
+	{
+		room = r;
+		room_name = ft_strndup(str, '-');
+		while ((*room))
+		{
+			if (!ft_strcmp((*room)->name, room_name))
+				return (1);
+			room = &(*room)->next;
+		}
+	}
+	return (0);
+}
+
+
+
+// int		links(t_room **r, char *str)
+// {
+// 	t_room	**room1;
+// 	t_room	**room2;
+// 	char	*link1;
+// 	char	*link2;
+
+// 	room1 = r;
+// 	link1 = ft_strndup(str, '-');
+// 	while ((*room1) && (*room1)->name != link)
+// 		room1 = &(*room1)->next;
+// 	if ((*room1)->name == link)
+// 	{
+// 		room2 = r;
+// 		link2 = ft_strdup(ft_strchr(str, '-') + 1);
+// 		while ((*room2) && (*room2)->link2)
+// 			room2 = &(*room2)->next;
+// 		if ((*room2)->name = link2)
+// 		{
+
+// 		}
+// 	}
+// }
+
+int		parcer(t_data *data)
 {
 	char	*str;
 	int		index;
-	int		n;
 
 	str = NULL;
 	index = 0;
@@ -149,13 +190,14 @@ int		parcer(t_data *data, t_room *room)
 		return (0);
 	while (get_next_line(0, &str))
 	{
-		printf("      |%s|\n", str);
-		if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
-			!start_end(&data, room, str, &index))
+		if (!room_or_link(&data->room, str) && (!ft_strcmp(str, "##start") ||
+			!ft_strcmp(str, "##end")) && !start_end(data, str, &index))
 			break ;
-		else if (!check_valid(str) || !create_room(&room, str, &index))
+		else if (!room_or_link(&(data->room), str) && (ft_strcmp(str, "##start") &&
+			ft_strcmp(str, "##end")) && (!check_valid(str) || !create_room(&(data->room), str, &index)))
 			break ;
-		printf("   ??%s??\n", str);
+		// else if (room_or_link(&room, str) && create_tabl(data) && !links(&room, str))
+		// 	break ;
 		ft_strdel(&str);
 	}
 	ft_strdel(&str);
@@ -168,12 +210,11 @@ int		parcer(t_data *data, t_room *room)
 int		main(void)
 {
 	t_data		*data;
-	t_room		*room;
 
-	room = (t_room *)malloc(sizeof(t_room));
 	data = (t_data *)malloc(sizeof(t_data));
-	reset(data, room);
-	if (!parcer(data, room))
+	data->room = (t_room *)malloc(sizeof(t_room));
+	reset(data);
+	if (!parcer(data))
 		printf("\033[91mERROR\033[0m\n");
 	else
 		printf("\033[92mHAKEY\033[0m\n");
