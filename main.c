@@ -24,6 +24,8 @@ void	reset(t_data *data)
 	data->ants_count = 0;
 	data->start = NULL;
 	data->end = NULL;
+	data->index_start = 0;
+	data->index_end = 0;
 }
 
 int		ants_count(t_data *data)
@@ -35,6 +37,8 @@ int		ants_count(t_data *data)
 	str = NULL;
 	if (get_next_line(0, &str) <= 0)
 		return (0);
+	if (str[i] == '+')
+		i++;
 	while (str[i] && ft_isdigit(str[i]))
 		i++;
 	if (str[i] != '\0')
@@ -104,6 +108,20 @@ int		check_valid(char *str)
 	return (1);
 }
 
+void	add_start_end(t_data *data, char *str, char *tmp, int *index)
+{
+	if ((!ft_strcmp(str, "##start")))
+	{
+		data->start = ft_strndup(tmp, ' ');
+		data->index_start = (*index);
+	}
+	if ((!ft_strcmp(str, "##end")))
+	{
+		data->end = ft_strndup(tmp, ' ');
+		data->index_end = (*index);
+	}
+}
+
 int		start_end(t_data *data, char *str, int *index)
 {
 	char	*tmp;
@@ -116,22 +134,23 @@ int		start_end(t_data *data, char *str, int *index)
 		create_room(&(data->room), tmp, index))
 	{
 		printf("	tmp = |%s|\n", tmp);
-		if ((!ft_strcmp(str, "##start") && (data)->start != NULL) ||
-			(!ft_strcmp(str, "##end") && (data)->end != NULL))
+		if ((!ft_strcmp(str, "##start") && data->start != NULL) ||
+			(!ft_strcmp(str, "##end") && data->end != NULL))
 		{
-			(data)->end = NULL;
-			(data)->start = NULL;
-			return (0); 
+			data->end = NULL;
+			data->start = NULL;
+			return (0);
 		}
-		if ((!ft_strcmp(str, "##start")))
-			(data)->start = ft_strndup(tmp, ' ');
-		if ((!ft_strcmp(str, "##end")))
-			(data)->end = ft_strndup(tmp, ' ');
+		add_start_end(data, str, tmp, index);
+		// if ((!ft_strcmp(str, "##start")))
+		// 	data->start = ft_strndup(tmp, ' ');
+		// if ((!ft_strcmp(str, "##end")))
+		// 	data->end = ft_strndup(tmp, ' ');
 		ft_strdel(&tmp);
 		return (1);
 	}
-	(data)->end = NULL;
-	(data)->start = NULL;
+	data->end = NULL;
+	data->start = NULL;
 	return (0);
 }
 
@@ -217,7 +236,8 @@ int		parcer(t_data *data)
 		ft_strdel(&str);
 	}
 	creare_tabl(data, index);
-	while (str && room_or_link(&data->room, str) && links(data, &(data->room), str))
+	while (str && room_or_link(&data->room, str) &&
+		links(data, &(data->room), str))
 	{
 		ft_strdel(&str);
 		printf("links\n");
@@ -246,6 +266,6 @@ int		main(void)
 			printf("\033[92mHAKEY\033[0m\n");
 	}
 	else
-		printf("\033[92mHAKEY\033[0m\n");
+		printf("\033[91mERROR\033[0m\n");
 	return (0);
 }

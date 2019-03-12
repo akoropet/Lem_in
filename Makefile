@@ -18,7 +18,7 @@ LIB = ./lib/lib.a
 
 OB = $(SRC:.c=.o)
 
-# FLAGS = -Wall -Werror -Wextra
+FLAGS = -Wall -Werror -Wextra
 # FLAGS = -Weverything
 
 all: $(NAME)

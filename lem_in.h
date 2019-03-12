@@ -31,6 +31,8 @@ typedef struct		s_data
 	char			**links;
 	int				count_room;
 	int				ants_count;
+	int				index_start;
+	int				index_end;
 	char			*start;
 	char			*end;
 	struct s_room	*room;
