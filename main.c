@@ -192,33 +192,58 @@ void	creare_tabl(t_data *data, int index)
 	}
 }
 
+void	add_links(t_room **room1, t_room **room2, t_data *data, char **link)
+{
+	ft_strdel(link);
+	data->links[(*room2)->index][(*room1)->index] = '1';
+	data->links[(*room1)->index][(*room2)->index] = '1';
+	(*room1)->step = data->count_room;
+	(*room2)->step = data->count_room;
+}
+
 int		links(t_data *data, t_room **r, char *str)
 {
 	t_room	**room1;
 	t_room	**room2;
-	char	*link1;
-	char	*link2;
+	char	*link;
 
 	room1 = r;
-	link1 = ft_strndup(str, '-');
-	while ((*room1) && ft_strcmp((*room1)->name, link1))
+	if (str[0] == '#' && str[1] != '#')
+		return (1);
+	link = ft_strndup(str, '-');
+	while ((*room1) && ft_strcmp((*room1)->name, link))
 		room1 = &(*room1)->next;
-	if ((*room1) && !ft_strcmp((*room1)->name, link1))
+	if ((*room1) && !ft_strcmp((*room1)->name, link))
 	{
+		ft_strdel(&link);
 		room2 = r;
-		link2 = ft_strdup(ft_strchr(str, '-') + 1);
-		while ((*room2) && ft_strcmp((*room2)->name, link2))
+		link = ft_strdup(ft_strchr(str, '-') + 1);
+		while ((*room2) && ft_strcmp((*room2)->name, link))
 			room2 = &(*room2)->next;
-		if ((*room2) && !ft_strcmp((*room2)->name, link2))
+		if ((*room2) && !ft_strcmp((*room2)->name, link))
 		{
-			data->links[(*room2)->index][(*room1)->index] = '1';
-			data->links[(*room1)->index][(*room2)->index] = '1';
-			(*room1)->step = data->count_room;
-			(*room2)->step = data->count_room;
+			add_links(room1, room2, data, &link);
 			return (1);
 		}
 	}
 	return (0);
+}
+
+void	parcer_links(t_data *data, char **str)
+{
+	while ((*str))
+	{
+		if ((*str)[0] == '#' && (*str)[1] == '#')
+			break ;
+		else if ((*str)[0] != '#')
+		{
+			room_or_link(&data->room, (*str));
+			links(data, &(data->room), (*str));
+		}
+		ft_strdel(str);
+		get_next_line(0, str);
+	}
+	ft_strdel(str);
 }
 
 int		parcer(t_data *data)
@@ -230,25 +255,21 @@ int		parcer(t_data *data)
 	index = 0;
 	while (get_next_line(0, &str) && !room_or_link(&data->room, str))
 	{
-		if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
+		if (str[0] == '#' && str[1] != '#')
+			continue ;
+		else if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
 			!start_end(data, str, &index))
 			break ;
-		else if ((ft_strcmp(str, "##start") && ft_strcmp(str, "##end")) &&
+		else if (ft_strcmp(str, "##start") && ft_strcmp(str, "##end") &&
 			(!check_valid(str) || !create_room(&(data->room), str, &index)))
 			break ;
 		ft_strdel(&str);
 	}
 	creare_tabl(data, index);
-	while (str && room_or_link(&data->room, str) &&
-		links(data, &(data->room), str))
-	{
-		ft_strdel(&str);
-		printf("links\n");
-		get_next_line(0, &str);
-	}
-	int i = 0;
-	while (data->links[i])
-		printf("|%s|\n", data->links[i++]);
+	parcer_links(data, &str);
+	int i = -1;
+	while (++i < data->count_room)
+		printf("|%s|\n", data->links[i]);
 	if (data->end == NULL || data->start == NULL || str != NULL)
 		return (0);
 	return (1);
@@ -266,7 +287,6 @@ void	bfs_start(t_data *data)
 	(*room)->step = 0;
 	(*bfs)->queue = (*room)->index;
 	(*bfs)->next = NULL;
-	// printf("bfs_start = %s - %d\n", (*bfs)->queue->name, (*bfs)->queue->step);
 }
 
 t_room	*find_room(t_data *data, int index)
@@ -292,23 +312,6 @@ void	add_in_queue(t_bfs **b, t_room *room)
 	(*bfs)->queue = room->index;
 	(*bfs)->next = NULL;
 }
-
-// void	add_neighbors(t_data *data)
-// {
-// 	int		index;
-// 	t_bfs	*bfs;
-// 	t_room	*room;
-
-// 	index = 0;
-// 	bfs = data->bfs;
-// 	while (index < data->count_room)
-// 	{
-// 		room = find_room(data, index);
-// 		if (data->links[bfs->queue][index] == '1' && room->step == data->count_room)
-// 			add_in_queue(&bfs, find_room(data, index));
-// 		index++;
-// 	}
-// }
 
 void	add_step_and_delete_first(t_data *data)
 {
@@ -374,7 +377,6 @@ int		main(void)
 	data = (t_data *)malloc(sizeof(t_data));
 	data->room = (t_room *)malloc(sizeof(t_room));
 	data->bfs = (t_bfs *)malloc(sizeof(t_bfs));
-	// data->bfs->queue = (t_room *)malloc(sizeof(t_room));
 	reset(data);
 	if (ants_count(data))
 	{
@@ -392,44 +394,3 @@ int		main(void)
 		printf("\033[91mERROR3\033[0m\n");
 	return (0);
 }
-
-
-// void	add_neighbors(t_data *data, t_bfs **b, t_room **r)
-// {
-// 	t_bfs	**bfs;
-// 	t_room	**room;
-// 	int		i;
-
-// 	i = 0;
-// 	// printf("|%s|\n", data->links[(*b)->queue]);
-// 	while (i < data->count_room)
-// 	{
-// 		printf("1111 i = %d\n", i);
-// 		printf(">>>%d\n", (*b)->queue);
-// 		printf("2222\n");
-// 		if (data->links[(*b)->queue][i] == '1')
-// 		{
-// 			// printf("links[%d][%d]\n", (*b)->queue, i);
-// 			bfs = b;
-// 			room = r;
-// 			while ((*room)->index != i)
-// 				room = &(*room)->next;
-// 			while ((*bfs))
-// 			{
-// 				printf("	%d %d\n", (*b)->queue, (*bfs)->queue);
-// 				bfs = &(*bfs)->next;
-// 			}
-// 			if ((*room)->step == data->count_room)
-// 			{
-// 				(*bfs) = (t_bfs *)malloc(sizeof(t_bfs));
-// 				printf("_%p\n", &(*bfs));
-// 				printf("|%d|\n", (*b)->queue);
-// 				(*bfs)->queue = (*room)->index;
-// 				if ((*room)->index > (*r)->index)
-// 					(*room)->index = (*r)->index + 1;
-// 				(*bfs)->next = NULL;
-// 			}
-// 		}
-// 		i++;
-// 	}
-// }
