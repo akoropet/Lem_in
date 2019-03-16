@@ -14,6 +14,8 @@
 
 void	reset(t_data *data)
 {
+	data->bfs->next = NULL;
+	data->bfs->queue = 0;
 	data->room->next = NULL;
 	data->room->name = NULL;
 	data->room->index = 0;
@@ -74,11 +76,11 @@ int		create_room(t_room **r, char *str, int *index)
 		return (0);
 	*room = (t_room *)malloc(sizeof(t_room));
 	(*room)->name = name;
-	printf("	new_room->%s\n", (*room)->name);
 	(*room)->next = NULL;
 	(*room)->coord_x = x;
 	(*room)->coord_y = y;
 	(*room)->index = (*index);
+	printf("	new_room->%s, index = %d\n", (*room)->name, (*room)->index);
 	(*room)->ants = 0;
 	(*index)++;
 	printf("create_room end\n");
@@ -113,12 +115,15 @@ void	add_start_end(t_data *data, char *str, char *tmp, int *index)
 	if ((!ft_strcmp(str, "##start")))
 	{
 		data->start = ft_strndup(tmp, ' ');
-		data->index_start = (*index);
+		data->index_start = (*index) - 1;
+		// data->index_start = data->index_start - 1;
+		printf("\nindex_start = %d\n\n", data->index_start);
 	}
 	if ((!ft_strcmp(str, "##end")))
 	{
 		data->end = ft_strndup(tmp, ' ');
-		data->index_end = (*index);
+		data->index_end = (*index) - 1;
+		printf("\nindex_end = %d\n\n", data->index_end);
 	}
 }
 
@@ -142,10 +147,6 @@ int		start_end(t_data *data, char *str, int *index)
 			return (0);
 		}
 		add_start_end(data, str, tmp, index);
-		// if ((!ft_strcmp(str, "##start")))
-		// 	data->start = ft_strndup(tmp, ' ');
-		// if ((!ft_strcmp(str, "##end")))
-		// 	data->end = ft_strndup(tmp, ' ');
 		ft_strdel(&tmp);
 		return (1);
 	}
@@ -212,6 +213,8 @@ int		links(t_data *data, t_room **r, char *str)
 		{
 			data->links[(*room2)->index][(*room1)->index] = '1';
 			data->links[(*room1)->index][(*room2)->index] = '1';
+			(*room1)->step = data->count_room;
+			(*room2)->step = data->count_room;
 			return (1);
 		}
 	}
@@ -251,21 +254,182 @@ int		parcer(t_data *data)
 	return (1);
 }
 
+void	bfs_start(t_data *data)
+{
+	t_room	**room;
+	t_bfs	**bfs;
+
+	room = &(data->room);
+	bfs = &(data->bfs);
+	while ((*room) && data->index_start != (*room)->index)
+		room = &(*room)->next;
+	(*room)->step = 0;
+	(*bfs)->queue = (*room)->index;
+	(*bfs)->next = NULL;
+	// printf("bfs_start = %s - %d\n", (*bfs)->queue->name, (*bfs)->queue->step);
+}
+
+t_room	*find_room(t_data *data, int index)
+{
+	t_room	*room;
+
+	room = data->room;
+	while (room && room->index != index)
+		room = room->next;
+	if (room)
+		return (room);
+	return (NULL);
+}
+
+void	add_in_queue(t_bfs **b, t_room *room)
+{
+	t_bfs	**bfs;
+
+	bfs = b;
+	while ((*bfs))
+		bfs = &(*bfs)->next;
+	(*bfs) = (t_bfs *)malloc(sizeof(t_bfs));
+	(*bfs)->queue = room->index;
+	(*bfs)->next = NULL;
+}
+
+// void	add_neighbors(t_data *data)
+// {
+// 	int		index;
+// 	t_bfs	*bfs;
+// 	t_room	*room;
+
+// 	index = 0;
+// 	bfs = data->bfs;
+// 	while (index < data->count_room)
+// 	{
+// 		room = find_room(data, index);
+// 		if (data->links[bfs->queue][index] == '1' && room->step == data->count_room)
+// 			add_in_queue(&bfs, find_room(data, index));
+// 		index++;
+// 	}
+// }
+
+void	add_step_and_delete_first(t_data *data)
+{
+	t_room	*room1;
+	t_room	*room2;
+	t_bfs	*bfs;
+	t_bfs	*b;
+
+	room1 = find_room(data, data->bfs->queue);
+	bfs = data->bfs;
+	while (bfs)
+	{
+		room2 = find_room(data, bfs->queue);
+		if (room1->step < room2->step)
+			room2->step = room1->step + 1;
+		bfs = bfs->next;
+	}
+	bfs = data->bfs;
+	b = bfs;
+	bfs = bfs->next == NULL ? NULL : bfs->next;
+	free(b);
+	data->bfs = bfs;
+}
+
+int		ft_bfs(t_data *data)
+{
+	t_room	*room;
+	t_bfs	*bfs;
+	int		index;
+
+	bfs_start(data);
+	while (data->bfs != NULL)
+	{
+		index = 0;
+		bfs = data->bfs;
+		while (index < data->count_room)
+		{
+			room = find_room(data, index);
+			if (data->links[bfs->queue][index] == '1' &&
+				room->step == data->count_room)
+				add_in_queue(&bfs, find_room(data, index));
+			index++;
+		}
+		add_step_and_delete_first(data);
+	}
+	room = data->room;
+	while (room)
+	{
+		printf("room = %s, step = %d\n", room->name, room->step);
+		room = room->next;
+	}
+	printf("===============================================\n");
+	room = find_room(data, data->index_end);
+	if (room->step == data->count_room)
+		return (0);
+	return (1);
+}
+
 int		main(void)
 {
 	t_data		*data;
 
 	data = (t_data *)malloc(sizeof(t_data));
 	data->room = (t_room *)malloc(sizeof(t_room));
+	data->bfs = (t_bfs *)malloc(sizeof(t_bfs));
+	// data->bfs->queue = (t_room *)malloc(sizeof(t_room));
 	reset(data);
 	if (ants_count(data))
 	{
 		if (!parcer(data))
-			printf("\033[91mERROR\033[0m\n");
+			printf("\033[91mERROR1\033[0m\n");
 		else
-			printf("\033[92mHAKEY\033[0m\n");
+		{
+			if (!ft_bfs(data))
+				printf("\033[91mERROR2\033[0m\n");
+			else
+				printf("\033[92mHAKEY\033[0m\n");
+		}
 	}
 	else
-		printf("\033[91mERROR\033[0m\n");
+		printf("\033[91mERROR3\033[0m\n");
 	return (0);
 }
+
+
+// void	add_neighbors(t_data *data, t_bfs **b, t_room **r)
+// {
+// 	t_bfs	**bfs;
+// 	t_room	**room;
+// 	int		i;
+
+// 	i = 0;
+// 	// printf("|%s|\n", data->links[(*b)->queue]);
+// 	while (i < data->count_room)
+// 	{
+// 		printf("1111 i = %d\n", i);
+// 		printf(">>>%d\n", (*b)->queue);
+// 		printf("2222\n");
+// 		if (data->links[(*b)->queue][i] == '1')
+// 		{
+// 			// printf("links[%d][%d]\n", (*b)->queue, i);
+// 			bfs = b;
+// 			room = r;
+// 			while ((*room)->index != i)
+// 				room = &(*room)->next;
+// 			while ((*bfs))
+// 			{
+// 				printf("	%d %d\n", (*b)->queue, (*bfs)->queue);
+// 				bfs = &(*bfs)->next;
+// 			}
+// 			if ((*room)->step == data->count_room)
+// 			{
+// 				(*bfs) = (t_bfs *)malloc(sizeof(t_bfs));
+// 				printf("_%p\n", &(*bfs));
+// 				printf("|%d|\n", (*b)->queue);
+// 				(*bfs)->queue = (*room)->index;
+// 				if ((*room)->index > (*r)->index)
+// 					(*room)->index = (*r)->index + 1;
+// 				(*bfs)->next = NULL;
+// 			}
+// 		}
+// 		i++;
+// 	}
+// }

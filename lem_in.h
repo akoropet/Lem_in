@@ -21,10 +21,17 @@ typedef struct		s_room
 	char			*name;
 	int				index;
 	int				ants;
+	int				step;
 	int				coord_x;
 	int				coord_y;
 	struct s_room	*next;
 }					t_room;
+
+typedef struct		s_bfs
+{
+	int				queue;
+	struct s_bfs	*next;
+}					t_bfs;
 
 typedef struct		s_data
 {
@@ -36,6 +43,7 @@ typedef struct		s_data
 	char			*start;
 	char			*end;
 	struct s_room	*room;
+	struct s_bfs	*bfs;
 }					t_data;
 
 #endif
