@@ -14,6 +14,8 @@
 
 void	reset(t_data *data)
 {
+	data->way = NULL;
+	// data->way->next = NULL;
 	data->bfs->next = NULL;
 	data->bfs->queue = 0;
 	data->room->next = NULL;
@@ -28,6 +30,9 @@ void	reset(t_data *data)
 	data->end = NULL;
 	data->index_start = 0;
 	data->index_end = 0;
+	data->error = 0;
+	data->comment_color = 0;
+	data->comment_error = 0;
 }
 
 int		ants_count(t_data *data)
@@ -37,18 +42,21 @@ int		ants_count(t_data *data)
 
 	i = 0;
 	str = NULL;
-	if (get_next_line(0, &str) <= 0)
+	if (get_next_line(0, &str) <= 0 && ++data->error)
 		return (0);
+	ft_putstr("\033[91m");
+	ft_putendl(str);
+	ft_putstr("\033[0m");
 	if (str[i] == '+')
 		i++;
 	while (str[i] && ft_isdigit(str[i]))
 		i++;
-	if (str[i] != '\0')
+	if (str[i] != '\0' && ++data->error)
 	{
 		ft_strdel(&str);
 		return (0);
 	}
-	if ((data->ants_count = ft_atoi(str)) == 0)
+	if ((data->ants_count = ft_atoi(str)) == 0 && ++data->error)
 		return (0);
 	ft_strdel(&str);
 	return (1);
@@ -62,6 +70,9 @@ int		create_room(t_room **r, char *str, int *index)
 	t_room	**room;
 
 	printf("\ncreate_room start|%s|\n", str);
+	ft_putstr("\033[91m");
+	ft_putendl(str);
+	ft_putstr("\033[0m");
 	room = r;
 	x = ft_atoi(ft_strchr(str, ' '));
 	y = ft_atoi(ft_strchr((ft_strchr(str, ' ') + 1), ' '));
@@ -79,10 +90,11 @@ int		create_room(t_room **r, char *str, int *index)
 	(*room)->next = NULL;
 	(*room)->coord_x = x;
 	(*room)->coord_y = y;
-	(*room)->index = (*index);
+	(*room)->index = (*index)++;
 	printf("	new_room->%s, index = %d\n", (*room)->name, (*room)->index);
 	(*room)->ants = 0;
-	(*index)++;
+	(*room)->number = 0;
+	// (*index)++;
 	printf("create_room end\n");
 	return (1);
 }
@@ -112,10 +124,14 @@ int		check_valid(char *str)
 
 void	add_start_end(t_data *data, char *str, char *tmp, int *index)
 {
+	t_room	*room;
+
 	if ((!ft_strcmp(str, "##start")))
 	{
 		data->start = ft_strndup(tmp, ' ');
 		data->index_start = (*index) - 1;
+		room = find_room(data, data->index_start);
+		room->ants = data->ants_count;
 		// data->index_start = data->index_start - 1;
 		printf("\nindex_start = %d\n\n", data->index_start);
 	}
@@ -135,6 +151,9 @@ int		start_end(t_data *data, char *str, int *index)
 	tmp = NULL;
 	i = 0;
 	printf("\n'start_end' start->|%s|\n", str);
+	ft_putstr("\033[91m");
+	ft_putendl(str);
+	ft_putstr("\033[0m");
 	if (get_next_line(0, &tmp) && check_valid(tmp) &&
 		create_room(&(data->room), tmp, index))
 	{
@@ -229,6 +248,27 @@ int		links(t_data *data, t_room **r, char *str)
 	return (0);
 }
 
+int		valid_links(t_data *data, char **str)
+{
+	t_room	*room;
+	char	*name;
+
+	room = data->room;
+	name = ft_strndup((*str), '-');
+	while (room && ft_strcmp(name, room->name))
+		room = room->next;
+	ft_strdel(&name);
+	if (!room || !ft_strchr((*str), '-'))
+		return (0);
+	room = data->room;
+	name = ft_strchr((*str), '-') + 1;
+	while (room && ft_strcmp(name, room->name))
+		room = room->next;
+	if (!room)
+		return (0);
+	return (1);
+}
+
 void	parcer_links(t_data *data, char **str)
 {
 	while ((*str))
@@ -237,6 +277,14 @@ void	parcer_links(t_data *data, char **str)
 			break ;
 		else if ((*str)[0] != '#')
 		{
+			ft_putstr("\033[91m");
+			ft_putendl((*str));
+			ft_putstr("\033[0m");
+			if (!valid_links(data, str))
+			{
+				data->error = data->error + 3;
+				break ;
+			}
 			room_or_link(&data->room, (*str));
 			links(data, &(data->room), (*str));
 		}
@@ -246,31 +294,42 @@ void	parcer_links(t_data *data, char **str)
 	ft_strdel(str);
 }
 
+void	comment(t_data *data, char *str)
+{
+	if (!ft_strcmp("#color", str))
+		data->comment_color = 1;
+	if (!ft_strcmp("#error", str))
+		data->comment_error = 1;
+}
+
 int		parcer(t_data *data)
 {
 	char	*str;
 	int		index;
+	int		status;
 
 	str = NULL;
 	index = 0;
-	while (get_next_line(0, &str) && !room_or_link(&data->room, str))
+	status = 1;
+	while (get_next_line(0, &str) && !room_or_link(&data->room, str) && status)
 	{
 		if (str[0] == '#' && str[1] != '#')
-			continue ;
+			comment(data, str);
 		else if ((!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end")) &&
 			!start_end(data, str, &index))
-			break ;
+			status = 0;
 		else if (ft_strcmp(str, "##start") && ft_strcmp(str, "##end") &&
 			(!check_valid(str) || !create_room(&(data->room), str, &index)))
-			break ;
+			status = 0;
 		ft_strdel(&str);
 	}
-	creare_tabl(data, index);
-	parcer_links(data, &str);
+	data->error = !status ? data->error + 2 : data->error;
+	status ? creare_tabl(data, index) : 0;
+	status ? parcer_links(data, &str) : 0;
 	int i = -1;
 	while (++i < data->count_room)
 		printf("|%s|\n", data->links[i]);
-	if (data->end == NULL || data->start == NULL || str != NULL)
+	if (data->end == NULL || data->start == NULL || str != NULL || !status)
 		return (0);
 	return (1);
 }
@@ -331,9 +390,57 @@ void	add_step_and_delete_first(t_data *data)
 	}
 	bfs = data->bfs;
 	b = bfs;
-	bfs = bfs->next == NULL ? NULL : bfs->next;
+	bfs = bfs->next;
 	free(b);
 	data->bfs = bfs;
+}
+
+t_room	*find_neighbor(t_data *data, t_room *r, int step)
+{
+	t_room	*room;
+	int		i;
+
+	i = 0;
+	while (data->links[r->index][i])
+	{
+		if (data->links[r->index][i] == '1')
+		{
+			room = find_room(data, i);
+			if (room && room->step == step - 1)
+				return (room);
+		}
+		i++;
+	}
+	return (NULL);
+}
+
+int		add_way(t_data *data, t_way **way, t_room *room)
+{
+	int		i;
+	int		numb;
+	int		step;
+
+	i = 0;
+	numb = -1;
+	while ((*way) != NULL && --numb)
+		(way) = &(*way)->next;
+	(*way) = (t_way *)malloc(sizeof(t_way));
+	(*way)->next = NULL;
+	(*way)->range = room->step + 1;
+	(*way)->queue = (int *)malloc(sizeof(int) * ((*way)->range));
+	(*way)->queue[i] = room->index;
+	step = room->step;
+	room->step = data->count_room;
+	while (++i < (*way)->range)
+	{
+		room = find_neighbor(data, room, step);
+		room->step = numb;
+		(*way)->queue[i] = room->index;
+		step--;
+	}
+	if ((*way)->range == 2)
+		return (0);
+	return (1);
 }
 
 int		ft_bfs(t_data *data)
@@ -367,7 +474,152 @@ int		ft_bfs(t_data *data)
 	room = find_room(data, data->index_end);
 	if (room->step == data->count_room)
 		return (0);
+	return (add_way(data, &(data->way), room));
+}
+
+void	reset_bfs(t_data *data)
+{
+	t_room	*room;
+
+	room = data->room;
+	while (room)
+	{
+		if (room->step > 0)
+		{
+			printf("name = %s, step = %d\n", room->name, room->step);
+			room->step = data->count_room;
+			printf("name = %s, step = %d\n\n", room->name, room->step);
+		}
+		room = room->next;
+	}
+	data->bfs = (t_bfs *)malloc(sizeof(t_bfs));
+}
+
+void	error(t_data *data)
+{
+	if (data->error && data->comment_error)
+	{
+		ft_printf("\033[91m%lc ", L'😱');
+		ft_putstr("ERROR");
+		ft_printf(" %lc\033[0m", L'😱');
+		ft_putchar('\n');
+		if (data->error == 1 && !data->comment_color)
+			ft_putstr("Invalid number of ants\n");
+		if (data->error == 2 && !data->comment_color)
+			ft_putstr("Invalid room data\n");
+		if (data->error == 3 && !data->comment_color)
+			ft_putstr("Invalid connection data\n");
+		if (data->error == 1 && data->comment_color)
+			ft_printf("%lc Invalid number of ants %lc\n", L'🐜', L'🐜');
+		if (data->error == 2 && data->comment_color)
+			ft_printf("%lc Invalid room data %lc\n", L'🏠', L'🏠');
+		if (data->error == 3 && data->comment_color)
+			ft_printf("%lc Invalid connection data %lc\n", L'🏘', L'🏘');
+		data->error = 0;
+	}
+}
+
+void	residue(t_data *data)
+{
+	char	*str;
+
+	str = NULL;
+	while (get_next_line(0, &str))
+	{
+		comment(data, str);
+		ft_strdel(&str);
+	}
+	error(data);
+}
+
+int		move_ants(t_data *data, t_way *way, int *ants_num, int a)
+{
+	t_room	*room;
+	int		i;
+	int		number;
+
+	i = 0;
+	while (i < way->range)
+	{
+		room = find_room(data, way->queue[i]);
+		if (room->ants && i > 0)
+		{
+			room->ants--;
+			number = room->number;
+			room->number = 0;
+			room = find_room(data, way->queue[i - 1]);
+			room->ants++;
+			room->number = !number ? ++(*ants_num) : number;
+			if (a > room->number)
+				ft_printf("\n");
+			ft_printf("L%d-%s ", room->number, room->name);
+			// return (room->number);
+		}
+		i++;
+	}
+	return (room->number);
+}
+
+void	transfer(t_data *data)
+{
+	t_way	*way;
+	t_room	*room;
+	int		ants_num;
+	int		a;
+
+	ants_num = 0;
+	a = 1;
+	way = data->way;
+	room = find_room(data, way->queue[0]);
+	while (room->ants != data->ants_count)
+	{
+		way = data->way;
+		while (way)
+		{
+			a = move_ants(data, way, &ants_num, a);
+			way = way->next;
+		}
+	}
+	printf("\n");
+}
+
+int		check_queue(t_way **w1, t_way **w2)
+{
+	int		i;
+
+	i = 0;
+	while (i < (*w1)->range && i < (*w2)->range &&
+		(*w1)->queue[i] == (*w2)->queue[i])
+		i++;
+	if (i == (*w1)->range && i == (*w2)->range)
+		return (0);
 	return (1);
+}
+
+void	check_way(t_data *data)
+{
+	t_way	**w1;
+	t_way	**w2;
+	t_way	**wr;
+
+	w1 = &(data->way);
+	wr = &(data->way);
+	while ((*w1))
+	{
+		wr = &(*w1)->next;
+		while ((*wr) && (*w2))
+		{
+			w2 = &(*wr)->next;
+			if ((*w1)->range == (*w2)->range && check_queue(w1, w2))
+			{
+				(*wr)->next = (*w2)->next;
+				free((*w1));
+			}
+			w2 = &(*w2)->next;
+			wr = &(*wr)->next;
+		}
+		w1 = &(*w1)->next;
+	}
 }
 
 int		main(void)
@@ -377,20 +629,40 @@ int		main(void)
 	data = (t_data *)malloc(sizeof(t_data));
 	data->room = (t_room *)malloc(sizeof(t_room));
 	data->bfs = (t_bfs *)malloc(sizeof(t_bfs));
+	// data->way = (t_way *)malloc(sizeof(t_way));
 	reset(data);
-	if (ants_count(data))
+	if (ants_count(data) && parcer(data))
 	{
-		if (!parcer(data))
-			printf("\033[91mERROR1\033[0m\n");
-		else
+		residue(data);
+		while (ft_bfs(data))
+			reset_bfs(data);
+		// check_way(data);
+		if (data->way->range > 1)
+			transfer(data);
+		t_way *way;
+		t_room *room;
+		int i = 0;
+		way = data->way;
+		while (way)
 		{
-			if (!ft_bfs(data))
-				printf("\033[91mERROR2\033[0m\n");
-			else
-				printf("\033[92mHAKEY\033[0m\n");
+			i = 0;
+			while (i < way->range)
+			{
+				room = find_room(data, way->queue[i]);
+				printf("%s->", room->name);
+				i++;
+			}
+			printf("	range = %d\n", way->range);
+			way = way->next;
 		}
 	}
 	else
+	{
+		residue(data);
 		printf("\033[91mERROR3\033[0m\n");
+	}
+	printf("error = %d\n", data->error);
+	printf("comment_color = %d\n", data->comment_color);
+	printf("comment_error = %d\n", data->comment_error);
 	return (0);
 }
