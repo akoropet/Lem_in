@@ -46,12 +46,14 @@ typedef struct		s_data
 	char			**links;
 	char			**ants;
 	int				count_room;
-	long long int				ants_count;
+	int				ants_count;
 	int				index_start;
 	int				index_end;
 	int				comment_color;
 	int				comment_error;
+	int				comment_moves;
 	int				error;
+	int				moves;
 	char			*start;
 	char			*end;
 	struct s_room	*room;
@@ -60,6 +62,7 @@ typedef struct		s_data
 }					t_data;
 
 t_room	*find_room(t_data *data, int index);
+int		comment(t_data *data, char *str);
 
 #endif
 

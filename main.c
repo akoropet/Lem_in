@@ -15,6 +15,7 @@
 void	reset(t_data *data)
 {
 	// data->bfs = NULL;
+	data->moves = 0;
 	data->way = NULL;
 	data->ants = NULL;
 	data->links = NULL;
@@ -35,6 +36,7 @@ void	reset(t_data *data)
 	data->error = 0;
 	data->comment_color = 0;
 	data->comment_error = 0;
+	data->comment_moves = 0;
 }
 
 int		ants_count(t_data *data)
@@ -171,6 +173,8 @@ int		start_end(t_data *data, char *str, int *index)
 
 	tmp = NULL;
 	i = 0;
+	if (comment(data, str))
+		return (1);
 	ft_putendl(str);
 	if (get_next_line(0, &tmp))
 		ft_putendl(tmp);
@@ -296,12 +300,24 @@ int		valid_links(t_data *data, char **str)
 	return (1);
 }
 
-void	comment(t_data *data, char *str)
+int		comment(t_data *data, char *str)
 {
 	if (str && !ft_strcmp("#color", str))
+	{
 		data->comment_color = 1;
+		return (1);
+	}
 	if (str && !ft_strcmp("#error", str))
+	{
 		data->comment_error = 1;
+		return (1);
+	}
+	if (str && !ft_strcmp("#moves", str))
+	{
+		data->comment_moves = 1;
+		return (1);
+	}
+	return (0);
 }
 
 int		parcer_links(t_data *data, char **str)
@@ -339,8 +355,9 @@ int		hashtag(t_data *data, char *str)
 	i = 0;
 	if (!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end"))
 		return (1);
-	comment(data, str);
-	while (str[i] == '#')
+	if (comment(data, str))
+		return (1);
+	while (!ft_isalpha(str[i]))
 		i++;
 	if (!ft_strcmp("end", str + i) || !ft_strcmp("start", str + i))
 	{
@@ -366,14 +383,15 @@ int		parcer(t_data *data, int index)
 		// if (str[0] == '#' && str[1] != '#')
 		// 	comment(data, str);
 		if (status && (!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end"))
-			&& !start_end(data, str, &index))
+			&& !comment(data, str) && !start_end(data, str, &index))
 			status = 0;
 		if (status && ft_strcmp(str, "##start") && ft_strcmp(str, "##end") &&
-			(!check_valid(str) || !create_room(&(data->room), str, &index)))
+			!comment(data, str) && (!check_valid(str) ||
+				!create_room(&(data->room), str, &index)))
 			status = 0;
 		ft_strdel(&str);
 	}
-	printf("status = %d\n", status);
+	// printf("status = %d\n", status);
 	comment(data, str);
 	// printf("1111\n");
 	data->error = !status || !str ? data->error + 2 : data->error;
@@ -666,15 +684,26 @@ void	finish(t_data *data)
 	{
 		ft_printf("\033[96m\nCongratulations %lc ", L'🎊');
 		ft_printf("\033[95mAll ants have reached their destination %lc", L'🐜');
-		ft_printf("\033[94m Well done %lc\033[0m\n", L'👍');
+		ft_printf("\033[94m Well done %lc\n", L'👍');
+		if (data->comment_moves)
+		{
+			ft_printf("\033[92mIt took \033[93m%d", data->moves);
+			ft_printf(" \033[92mturns for the transfer %lc\n", L'👣');
+		}
 	}
 	else
 	{
 		ft_printf("\nCongratulations! ");
 		ft_printf("All ants have reached their destination.");
 		ft_printf(" Well done %lc\n", L'✌');
+		if (data->comment_moves)
+			ft_printf("It took %d turns for the transfer.\n", data->moves);
 	}
+	ft_putstr("\033[0m");
 }
+
+// it took 6 turns for the transfer
+// 👣
 
 void	transfer(t_data *data)
 {
@@ -700,6 +729,7 @@ void	transfer(t_data *data)
 		}
 		ant++;
 	}
+	data->moves++;
 	ft_putstr("\n");
 }
 
