@@ -46,7 +46,7 @@ typedef struct		s_data
 	char			**links;
 	char			**ants;
 	int				count_room;
-	int				ants_count;
+	long long int				ants_count;
 	int				index_start;
 	int				index_end;
 	int				comment_color;
