@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/11 19:05:26 by akoropet          #+#    #+#             */
-/*   Updated: 2019/02/18 15:22:54 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/26 21:11:20 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int					ft_isascii(int c);
 int					ft_isdigit(int c);
 int					ft_isprint(int c);
 char				*ft_itoa(int a);
-char				*ft_itoa_base(long long int value, long base);
+char				*ft_itoa_base(long long int v, size_t base);
 char				*ft_uitoa_base(unsigned long long int value,
 	unsigned long long int base);
 void				*ft_memalloc(size_t size);

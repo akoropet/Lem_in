@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/11 19:27:21 by akoropet          #+#    #+#             */
-/*   Updated: 2019/02/18 15:12:32 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/02/28 13:39:39 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,41 @@
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
-void	make(long long int value, long base, char *str, int *i)
+static int		size_str(size_t value, size_t base)
 {
-	char	*tmp;
+	int		count;
 
-	tmp = "0123456789abcdef";
-	if (value <= -base || value >= base)
-		make(value / base, base, str, i);
-	str[(*i)++] = tmp[ABS(value % base)];
+	count = 1;
+	while (value >= base)
+	{
+		value /= base;
+		count++;
+	}
+	return (count);
 }
 
-char	*ft_itoa_base(long long int value, long base)
+char			*ft_itoa_base(long long int v, size_t base)
 {
-	int		i;
 	char	*str;
+	int		count;
+	char	*tmp;
+	size_t	value;
 
-	i = 0;
-	if (base < 2 || base > 16 || !(str = (char *)malloc(32)))
-		return (0);
-	if (base == 10 && value < 0)
-		str[i++] = '-';
-	make(value, base, str, &i);
-	str[i] = '\0';
+	tmp = "0123456789abcdef";
+	count = 0;
+	if (base < 2 || base > 16)
+		return (NULL);
+	value = v < 0 && base == 10 ? v * -1 : v;
+	count = size_str(value, base);
+	count = v < 0 && base == 10 ? count + 1 : count;
+	str = (char *)malloc(count + 1);
+	str[count--] = '\0';
+	v < 0 && base == 10 ? str[0] = '-' : 0;
+	while (count >= 0 && str[count] != '-')
+	{
+		str[count] = tmp[ABS(value % base)];
+		value /= base;
+		count--;
+	}
 	return (str);
 }
