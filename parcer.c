@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:28:37 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:31:14 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 07:15:40 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,12 @@ int		check_valid(t_data *data, char *str, int i)
 
 int		parcer_links(t_data *data, char **str)
 {
-	data->u_color ? ft_putstr("\033[96m") : 0;
 	while ((*str))
 	{
 		// ft_putstr("\033[91m");
-		ft_putendl((*str));
+		data->u_color ? ft_putstr("\033[96m") : 0;
+		if ((*str)[0] != '#')
+			ft_putendl((*str));
 		// ft_putstr("\033[0m");
 		if (!valid_links(data, str))
 			return (0);
@@ -66,6 +67,8 @@ int		valid_links(t_data *data, char **str)
 	int		i;
 
 	i = 0;
+	if ((*str)[i] == '#')
+		return (1);
 	while ((*str)[i] && ft_isprint((*str)[i]))
 		i++;
 	if ((*str)[i])
@@ -125,7 +128,6 @@ int		parcer(t_data *data, int index)
 	while (get_next_line(0, &str) > 0 && status &&
 		!room_or_link(&data->room, str))
 	{
-		// ft_putendl(str);
 		if (str[0] == '#' && ft_strcmp(str, "##start") &&
 			ft_strcmp(str, "##end"))
 			comment(data, str);
@@ -133,15 +135,14 @@ int		parcer(t_data *data, int index)
 			!ft_strcmp(str, "##end")) && !start_end(data, str, &index))
 			status = 0;
 		else if (status && ft_strcmp(str, "##start") && ft_strcmp(str, "##end")
-			&& (!check_valid(data, str, 0) || !create_room(&(data->room), str, &index)))
+			&& (!check_valid(data, str, 0) ||
+				!create_room(&(data->room), str, &index)))
 			status = 0;
 		ft_strdel(&str);
 	}
+	status = data->start == NULL || data->end == NULL ? 0 : status;
 	status && str ? creare_tabl(data, index) : 0;
 	status = status && str ? parcer_links(data, &str) : 0;
 	ft_strdel(&str);
-	// printf("%s %s %s %d\n", data->end, data->start, str, status);
-	// if (data->end == NULL || data->start == NULL || str != NULL || !status)
-	// 	return (0);
 	return (data->end != NULL && data->start != NULL && str == NULL);
 }

@@ -6,13 +6,13 @@
 #    By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/03/07 22:00:39 by akoropet          #+#    #+#              #
-#    Updated: 2019/03/31 00:18:15 by akoropet         ###   ########.fr        #
+#    Updated: 2019/03/31 07:07:58 by akoropet         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = lem_in
 
-SRC = main.c parcer.c rooms.c bfs.c links.c ways.c output.c moves.c
+SRC = main.c parcer.c rooms.c bfs.c links.c ways.c output.c moves.c flags.c
 
 LIB = ./lib/lib.a
 

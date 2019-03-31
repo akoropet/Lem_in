@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:47:52 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:44:44 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 07:29:26 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,29 +55,15 @@ void	error(t_data *data, int status)
 		data->u_color ? ft_printf(" %lc\n", L'🚷') : 0;
 		!data->u_color ? ft_putstr("\n") : 0;
 	}
-		// if (!data->comment_color && data->comment_error)
-		// {
-		// 	if (data->error == 1)
-		// 		ft_printf("Reason %lc Invalid number of ants\n", L'☛');
-		// 	if (data->error == 2)
-		// 		ft_printf("Reason %lc Invalid room data\n", L'☛');
-		// 	if (data->error == 3)
-		// 		ft_printf("Reason %lc Invalid connection data\n", L'☛');
-		// 	if (data->error == 4)
-		// 		ft_printf("Reason %lc Invalid way\n", L'☛');
-		// }
-		// if (data->comment_color && data->comment_error)
-		// 	color(data);
-		// data->error = 0;
-		// ft_putstr("\033[0m");
 }
 
 void	finish(t_data *data)
 {
+	data->u_paths ? ft_path(data) : 0;
 	if (data->u_color)
 	{
-		ft_printf("\033[96m\nCongratulations %lc ", L'🎊');
-		ft_printf("\033[95mAll ants have reached their destination %lc", L'🐜');
+		ft_printf("\033[95m\nCongratulations %lc ", L'🎊');
+		ft_printf("\033[96mAll ants have reached their destination %lc", L'🐜');
 		ft_printf("\033[94m Well done %lc\n", L'👍');
 		if (data->u_moves)
 		{
@@ -93,6 +79,7 @@ void	finish(t_data *data)
 		if (data->u_moves)
 			ft_printf("It took %d turns for the transfer.\n", data->moves);
 	}
+	data->u_comment ? ft_comment(data) : 0;
 	ft_putstr("\033[0m");
 }
 

@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/07 21:58:27 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:35:54 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 07:26:31 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,8 @@ int		move_ants(t_data *data, t_way *way, int i, int ant);
 int		transfer(t_data *data, int ant);
 
 void	reset(t_data *data);
+void	ft_comment(t_data *data);
+void	ft_path(t_data *data);
 
 #endif
 
