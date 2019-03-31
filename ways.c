@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:44:16 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 01:56:15 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 16:44:20 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int		normal_way(t_data *data, t_way *w)
 
 	way = data->way;
 	res = 0;
-	while (way && way->index < w->index)
+	while (way && w && way->index < w->index)
 	{
 		res += w->range - way->range;
 		way = way->next;
@@ -71,41 +71,48 @@ t_room	*create_ants(t_data *data)
 	return (find_room(data, data->index_end));
 }
 
-// void	check_way(t_data *data)
-// {
-// 	t_way	**w1;
-// 	t_way	**w2;
-// 	t_way	**wr;
+int		add_way(t_data *data)
+{
+	t_room	*room;
+	t_way	**way;
+	int		index;
 
-// 	w1 = &(data->way);
-// 	wr = &(data->way);
-// 	while ((*w1))
-// 	{
-// 		wr = &(*w1)->next;
-// 		while ((*wr) && (*w2))
-// 		{
-// 			w2 = &(*wr)->next;
-// 			if ((*w1)->range == (*w2)->range && check_queue(w1, w2))
-// 			{
-// 				(*wr)->next = (*w2)->next;
-// 				free((*w1));
-// 			}
-// 			w2 = &(*w2)->next;
-// 			wr = &(*wr)->next;
-// 		}
-// 		w1 = &(*w1)->next;
-// 	}
-// }
+	index = 1;
+	way = &(data->way);
+	room = find_room(data, data->index_end);
+	while ((*way) && ++index)
+		way = &(*way)->next;
+	data->count_way++;
+	(*way) = (t_way *)malloc(sizeof(t_way));
+	(*way)->range = room->step;
+	(*way)->index = index;
+	(*way)->next = NULL;
+	(*way)->queue = (int *)malloc(sizeof(int) * ((*way)->range));
+	if (!(room = create_way(data, way, room)))
+	{
+		free((*way)->queue);
+		free((*way));
+		(*way) = NULL;
+		return (0);
+	}
+	ft_clear(data);
+	return (room->index == data->index_start);
+}
 
-// int		check_queue(t_way **w1, t_way **w2)
-// {
-// 	int		i;
+t_room	*create_way(t_data *data, t_way **way, t_room *room)
+{
+	int		i;
 
-// 	i = 0;
-// 	while (i < (*w1)->range && i < (*w2)->range &&
-// 		(*w1)->queue[i] == (*w2)->queue[i])
-// 		i++;
-// 	if (i == (*w1)->range && i == (*w2)->range)
-// 		return (0);
-// 	return (1);
-// }
+	i = 0;
+	while (i < (*way)->range)
+	{
+		(*way)->queue[i++] = room->index;
+		if (room->index == data->index_start)
+			break ;
+		if (!(room = find_neig(data, room, room->step)))
+			return (NULL);
+		if (room->index != data->index_start && room->index != data->index_end)
+			room->reserv = 1;
+	}
+	return (room);
+}

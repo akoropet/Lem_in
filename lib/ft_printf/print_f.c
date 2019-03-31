@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/09 17:17:08 by akoropet          #+#    #+#             */
-/*   Updated: 2019/02/28 20:10:19 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 08:27:25 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ char	*create_drob(long double d, int n)
 	}
 	r = ft_itoa_base(d, 10);
 	i = g_flags->precision > 0 ? g_flags->precision : 6;
-	drob = ft_memalloc(i);
+	drob = ft_memalloc(i + 1);
 	if (zero > 0)
 		ft_memset(drob, '0', zero);
 	ft_strncat(drob, r, i-- - zero);

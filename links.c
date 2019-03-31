@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:42:47 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:57:27 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 16:32:50 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,26 +68,28 @@ void	creare_tabl(t_data *data, int index)
 	}
 }
 
-int		room_or_link(t_room **r, char *str)
+int		room_or_link(t_room *room, char *str)
 {
-	t_room	**room;
 	char	*room_name;
 	int		i;
 
 	i = 0;
-	while (str[i] && str[i] != '-')
+	while (str[i] && str[i] != '-' && str[i] != ' ' && ft_isprint(str[i]))
 		i++;
+	if (!str[i] || str[i] == ' ')
+		return (0);
+	else if (str[i] == '-')
+		return (1);
 	if (str[i] && (room_name = ft_strndup(str, '-')))
 	{
-		room = r;
-		while ((*room) && (*room)->name)
+		while (room && room->name)
 		{
-			if (!ft_strcmp((*room)->name, room_name))
+			if (!ft_strcmp(room->name, room_name))
 			{
 				ft_strdel(&room_name);
 				return (1);
 			}
-			room = &(*room)->next;
+			room = room->next;
 		}
 		ft_strdel(&room_name);
 	}

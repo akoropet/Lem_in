@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:41:51 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:06:23 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 16:19:18 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ int		create_room(t_room **r, char *str, int *index)
 	char	*name;
 	t_room	**room;
 
-	// data->u_color ? ft_putstr("\033[96m") : 0;
-	// ft_putendl(str);
 	room = r;
 	x = ft_atoi(ft_strchr(str, ' '));
 	y = ft_atoi(ft_strchr((ft_strchr(str, ' ') + 1), ' '));
@@ -90,16 +88,11 @@ int		start_end(t_data *data, char *str, int *index)
 
 	tmp = NULL;
 	i = 0;
-	// if (comment(data, str))
-	// 	return (1);
-	// ft_putstr("\033[0m");
-	// data->u_color ? ft_putstr("\033[92m") : 0;
 	data->u_color ? ft_putstr("\033[95m") : 0;
 	ft_putendl(str);
-	if (get_next_line(0, &tmp) && tmp && check_valid(data, tmp, 0) && create_room(&(data->room), tmp, index))
+	if (get_next_line(0, &tmp) && tmp && check_valid(data, tmp, 0) &&
+		create_room(&(data->room), tmp, index))
 	{
-		// data->u_color ? ft_putstr("\033[95m") : 0;
-		// ft_putendl(tmp);
 		if ((!ft_strcmp(str, "##start") && data->start == NULL) ||
 			(!ft_strcmp(str, "##end") && data->end == NULL))
 		{
@@ -108,8 +101,6 @@ int		start_end(t_data *data, char *str, int *index)
 			return (1);
 		}
 	}
-	// data->u_color ? ft_putstr("\033[95m") : 0;
-	// ft_putendl(tmp);
 	ft_strdel(&tmp);
 	ft_strdel(&data->end);
 	ft_strdel(&data->start);

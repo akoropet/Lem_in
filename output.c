@@ -6,36 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:47:52 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 07:29:26 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 09:27:26 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
-
-// void	color(t_data *data)
-// {
-// 	if (data->error == 1 && data->comment_color)
-// 	{
-// 		ft_printf("%lc \033[96m Reason %lc\033[95m ", L'🐜', L'👉');
-// 		ft_printf("Invalid number of ants %lc\n", L'🐜');
-// 	}
-// 	if (data->error == 2 && data->comment_color)
-// 	{
-// 		ft_printf("%lc \033[96m Reason %lc\033[95m ", L'🏠', L'👉');
-// 		ft_printf("Invalid room data %lc\n", L'🏠');
-// 	}
-// 	if (data->error == 3 && data->comment_color)
-// 	{
-// 		ft_printf("\033[96m%lc  Reason %lc\033[95m ", L'🏘', L'👉');
-// 		ft_printf("Invalid connection data %lc\n", L'🏘');
-// 	}
-// 	if (data->error == 4 && data->comment_color)
-// 	{
-// 		ft_printf("\033[96m%lc  Reason %lc\033[95m ", L'🚷', L'👉');
-// 		ft_printf("Invalid way %lc\n", L'🚷');
-// 	}
-// 	ft_putstr("\033[0m");
-// }
 
 void	error(t_data *data, int status)
 {
@@ -59,7 +34,7 @@ void	error(t_data *data, int status)
 
 void	finish(t_data *data)
 {
-	data->u_paths ? ft_path(data) : 0;
+	data->u_paths ? u_path(data) : 0;
 	if (data->u_color)
 	{
 		ft_printf("\033[95m\nCongratulations %lc ", L'🎊');
@@ -79,7 +54,7 @@ void	finish(t_data *data)
 		if (data->u_moves)
 			ft_printf("It took %d turns for the transfer.\n", data->moves);
 	}
-	data->u_comment ? ft_comment(data) : 0;
+	data->u_comment ? u_comment(data) : 0;
 	ft_putstr("\033[0m");
 }
 
@@ -108,21 +83,29 @@ int		comment(t_data *data, char *str)
 	return (1);
 }
 
-int		hashtag(t_data *data, char *str)
+int		usage(t_data *data, int ac, char **av)
 {
 	int		i;
 
 	i = 0;
-	if (!ft_strcmp(str, "##start") || !ft_strcmp(str, "##end"))
-		return (1);
-	if (comment(data, str))
-		return (1);
-	while (!ft_isalpha(str[i]))
-		i++;
-	if (!ft_strcmp("end", str + i) || !ft_strcmp("start", str + i))
+	u_reset(data);
+	while (++i < ac)
 	{
-		ft_putendl(str);
-		return (0);
+		if (!ft_strcmp("--color", av[i]))
+			data->u_color = 1;
+		else if (!ft_strcmp("--move", av[i]))
+			data->u_moves = 1;
+		else if (!ft_strcmp("--path", av[i]))
+			data->u_paths = 1;
+		else if (!ft_strcmp("--comment", av[i]))
+			data->u_comment = 1;
+		else if (!ft_strcmp("--time", av[i]))
+			data->u_time = 1;
+		else
+		{
+			u_error();
+			return (0);
+		}
 	}
 	return (1);
 }
