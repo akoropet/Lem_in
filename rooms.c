@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:41:51 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/29 14:03:54 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 06:06:23 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ int		create_room(t_room **r, char *str, int *index)
 	char	*name;
 	t_room	**room;
 
+	// data->u_color ? ft_putstr("\033[96m") : 0;
 	// ft_putendl(str);
 	room = r;
 	x = ft_atoi(ft_strchr(str, ' '));
@@ -47,16 +48,6 @@ int		create_room(t_room **r, char *str, int *index)
 		(*room) = (t_room *)malloc(sizeof(t_room));
 	reset_room(room, name, x, y);
 	(*room)->index = (*index)++;
-	// ft_strdel(&name);
-	// printf("_%p\n", (*room));
-	// printf("_%p\n", &(*room));
-	// (*room)->name = name;
-	// (*room)->next = NULL;
-	// (*room)->coord_x = x;
-	// (*room)->coord_y = y;
-	// (*room)->index = (*index)++;
-	// (*room)->ants = 0;
-	// printf("%s=%s\n", name, (*room)->name);
 	return (1);
 }
 
@@ -70,16 +61,13 @@ void	add_start_end(t_data *data, char *str, char *tmp, int *index)
 		data->index_start = (*index) - 1;
 		room = find_room(data, data->index_start);
 		room->ants = data->ants_count;
-		// printf("%p\n", &str);
-		// printf("%p\n", data->start);
-		// data->index_start = data->index_start - 1;
-		// printf("\nindex_start = %d\n\n", data->index_start);
+		room->step = 1;
+		room->status = 0;
 	}
 	if ((!ft_strcmp(str, "##end")))
 	{
 		data->end = ft_strndup(tmp, ' ');
 		data->index_end = (*index) - 1;
-		// printf("\nindex_end = %d\n\n", data->index_end);
 	}
 }
 
@@ -102,13 +90,16 @@ int		start_end(t_data *data, char *str, int *index)
 
 	tmp = NULL;
 	i = 0;
-	if (comment(data, str))
-		return (1);
-	// if (get_next_line(0, &tmp))
-		// ft_putendl(tmp);
-	if (get_next_line(0, &tmp) && tmp && check_valid(tmp) && create_room(&(data->room), tmp, index))
+	// if (comment(data, str))
+	// 	return (1);
+	// ft_putstr("\033[0m");
+	// data->u_color ? ft_putstr("\033[92m") : 0;
+	data->u_color ? ft_putstr("\033[95m") : 0;
+	ft_putendl(str);
+	if (get_next_line(0, &tmp) && tmp && check_valid(data, tmp, 0) && create_room(&(data->room), tmp, index))
 	{
-		ft_putendl(tmp);
+		// data->u_color ? ft_putstr("\033[95m") : 0;
+		// ft_putendl(tmp);
 		if ((!ft_strcmp(str, "##start") && data->start == NULL) ||
 			(!ft_strcmp(str, "##end") && data->end == NULL))
 		{
@@ -116,11 +107,9 @@ int		start_end(t_data *data, char *str, int *index)
 			ft_strdel(&tmp);
 			return (1);
 		}
-		// add_start_end(data, str, tmp, index);
-		// ft_strdel(&tmp);
-		// return (1);
 	}
-	ft_putendl(tmp);
+	// data->u_color ? ft_putstr("\033[95m") : 0;
+	// ft_putendl(tmp);
 	ft_strdel(&tmp);
 	ft_strdel(&data->end);
 	ft_strdel(&data->start);

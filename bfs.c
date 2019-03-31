@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:34:40 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/30 23:50:26 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 02:38:31 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ t_room	*find_wave(t_data *data, int step)
 {
 	t_room	*neig;
 
-	// printf("find_wave\n");
 	neig = data->room;
 	while (neig)
 	{
@@ -31,46 +30,33 @@ t_room	*find_wave(t_data *data, int step)
 	return (NULL);
 }
 
-void	wave(t_data *data, int step)
+void	wave(t_data *data, t_room *room, int step)
 {
 	int		i;
 	t_room	*end;
 	t_room	*neig;
-	t_room	*room;
 
-	room = find_room(data, data->index_start);
 	end = find_room(data, data->index_end);
-	// printf("1\n");
 	while (end->step == data->count_room && step < data->count_room)
 	{
-		// printf("	step = %d\n", step);
 		while ((room = find_wave(data, step)))
 		{
-			// printf("	room->name = |%s|, step = %d\n", room->name, room->step);
-			// printf("3\n");
-			i = 0;
-			while (i < data->count_room)
+			i = -1;
+			while (++i < data->count_room)
 			{
-				// printf("4\n");
-				if (data->links[room->index][i] == '1' && (neig = find_room(data, i)) && (neig->step > step) && !neig->reserv)
-				{
-					// printf("qwe\n");
+				if (data->links[room->index][i] == '1' &&
+					(neig = find_room(data, i)) && (neig->step > step) &&
+					!neig->reserv)
 					neig->step = step + 1;
-					// printf("room |%s|, step %d, resern = %d\n", neig->name, neig->step, neig->reserv);
-				}
-				i++;
 			}
 		}
 		step++;
-			// printf("		step in end = %d\n", end->step);
 		if (end->step != data->count_room && add_way(data))
 		{
 			end->step = data->count_room;
 			step = 1;
 		}
 	}
-	// if (add_way(data))
-	// 	wave(data, 1);
 }
 
 

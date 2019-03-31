@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:48:46 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/30 23:47:32 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 05:51:48 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,13 @@ int		move_ants(t_data *data, t_way *way, int i, int ant)
 		room1 = find_room(data, way->queue[i]);
 		room1->ants--;
 		room2->ants++;
-		printf("L%d-%s ", ant, room2->name);
-		// if (i == 1)
-		// {
-		// 	room1 = find_room(data, way->queue[i - 1]);
-		// 	// printf("ant in end room = %d\n", room->ants);
-		// 	room1->ants++;
-		// }
-		// printf("11111\n");
-		// while (n < data->ants_count)
-		// {
-		// 	data->locat[n][way->queue[i - 1]] = '1';
-		// 	n++;
-		// }
+		if (data->u_color && room1->index == data->index_start)
+			ft_putstr("\033[92m");
+		else if (data->u_color && room2->index == data->index_end)
+			ft_putstr("\033[91m");
+		else if (data->u_color)
+			ft_putstr("\033[93m");
+		ft_printf("L%d-%s ", ant, room2->name);
 		return (1);
 	}
 	return (0);
@@ -71,45 +65,22 @@ int		transfer(t_data *data, int ant)
 	t_way	*way;
 	int		i;
 
-	// while (ant <= data->ants_count)
-	// {
 	way = data->way;
-	// printf("ant = %d\n", ant);
-	// if (data->locat[ant - 1][way->queue[0]] == '1')
-	// {
-	// 	return (1);
-	// }
-	// printf("++++\n");
 	while (ant <= data->ants_count)
 	{
 		way = data->way;
 		if (data->locat[ant - 1][way->queue[0]] == '1')
 			ant++;
-		while (way && ant <= data->ants_count && data->locat[ant - 1][way->queue[0]] != '1')
+		while (way && ant <= data->ants_count &&
+			data->locat[ant - 1][way->queue[0]] != '1')
 		{
-			i = 0;
-			// printf("???\n");
-			while (ant <= data->ants_count && ++i < way->range)
+			i = 1;
+			while (ant <= data->ants_count && i < way->range)
 			{
-				// printf("!!!!\n");
-				if (data->locat[ant - 1][way->queue[i]] == '1')
-				{
-					// printf("add move\n");
-					if (ft_go(data, way, i))
+				if (data->locat[ant - 1][way->queue[i]] == '1' &&
+					ft_go(data, way, i))
 						move_ants(data, way, i, ant);
-					// if (!ft_go(data, way, i))
-					// 	break ;
-					// if (move_ants(data, way, i, ant))
-					// {
-					// 	// printf("ant++\n");
-					// 	ant++;
-					// }
-					// else
-					// {
-					// 	// printf("\n");
-					// 	return (0);
-					// }
-				}
+					i++;
 			}
 			way = way->next;
 		}

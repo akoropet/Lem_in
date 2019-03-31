@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/07 21:58:27 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/30 23:00:17 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 06:35:54 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LEM_IN_H
 
 # include "./lib/libft/libft.h"
+# include <time.h>
 #include <stdio.h>
 
 typedef struct		s_room
@@ -30,11 +31,11 @@ typedef struct		s_room
 	struct s_room	*next;
 }					t_room;
 
-typedef struct		s_bfs
-{
-	int				queue;
-	struct s_bfs	*next;
-}					t_bfs;
+// typedef struct		s_bfs
+// {
+// 	int				queue;
+// 	struct s_bfs	*next;
+// }					t_bfs;
 
 typedef struct		s_way
 {
@@ -46,28 +47,31 @@ typedef struct		s_way
 
 typedef struct		s_data
 {
+	int				u_color;
+	int				u_moves;
+	int				u_paths;
+	int				u_leaks;
+	int				u_comment;
+	int				u_time;
 	char			**links;
 	char			**ants;
 	char			**locat;
 	char			*output;
+	char			*comment;
 	int				count_way;
 	int				count_room;
 	int				ants_count;
 	int				index_start;
 	int				index_end;
-	int				comment_color;
-	int				comment_error;
-	int				comment_moves;
-	int				error;
 	int				moves;
 	char			*start;
 	char			*end;
 	struct s_room	*room;
-	struct s_bfs	*bfs;
+	// struct s_bfs	*bfs;
 	struct s_way	*way;
 }					t_data;
 
-int		check_valid(char *str);
+int		check_valid(t_data *data, char *str, int i);
 int		parcer(t_data *data, int index);
 int		parcer_links(t_data *data, char **str);
 int		valid_links(t_data *data, char **str);
@@ -81,7 +85,7 @@ t_room	*find_room(t_data *data, int index);
 
 // int		ft_bfs(t_data *data, t_room *room, int step);
 t_room	*find_wave(t_data *data, int step);
-void	wave(t_data *data, int step);
+void	wave(t_data *data, t_room *room, int step);
 int		add_way(t_data *data);
 // int		ft_bfs(t_data *data);
 // void	bfs_start(t_data *data);
@@ -98,8 +102,8 @@ int		room_or_link(t_room **r, char *str);
 // t_room	*find_neighbor(t_data *data, t_room *r, int step);
 t_room	*create_ants(t_data *data);
 
-void	color(t_data *data);
-void	error(t_data *data);
+// void	color(t_data *data);
+void	error(t_data *data, int status);
 void	finish(t_data *data);
 int		comment(t_data *data, char *str);
 int		hashtag(t_data *data, char *str);

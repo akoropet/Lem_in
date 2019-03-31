@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:42:47 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/28 21:09:39 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 05:39:10 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ int		links(t_data *data, t_room **r, char *str)
 	char	*link;
 
 	room1 = r;
-	if (str[0] == '#' && str[1] != '#')
-		return (1);
+	if (str[0] == '#')
+		return (comment(data, str));
 	link = ft_strndup(str, '-');
 	while ((*room1) && ft_strcmp((*room1)->name, link))
 		room1 = &(*room1)->next;
@@ -72,8 +72,12 @@ int		room_or_link(t_room **r, char *str)
 {
 	t_room	**room;
 	char	*room_name;
+	int		i;
 
-	if (ft_strchr(str, '-'))
+	i = 0;
+	while (str[i] && str[i] != '-')
+		i++;
+	if (str[i])
 	{
 		// ft_putendl(str);
 		room = r;
