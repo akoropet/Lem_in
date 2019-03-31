@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/07 22:04:01 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 06:41:16 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 07:46:04 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,20 @@ int		usage(t_data *data, int ac, char **av)
 	return (1);
 }
 
+int		one_way(t_data *data)
+{
+	if (data->links[data->index_start][data->index_end] == '1')
+	{
+		data->way = (t_way *)malloc(sizeof(t_way));
+		data->way->index = 1;
+		data->way->range = 2;
+		data->way->queue = (int *)malloc(sizeof(int) * 2);
+		data->way->queue[0] = data->index_end;
+		data->way->queue[1] = data->index_start;
+		return (1);
+	}
+	return (0);
+}
 
 int		main(int ac, char **av)
 {
@@ -263,7 +277,8 @@ int		main(int ac, char **av)
 		room = find_room(data, data->index_start);
 		room->step = 1;
 		room->status = 0;
-		wave(data, find_room(data, data->index_start), 1);
+		if (!one_way(data))
+			wave(data, find_room(data, data->index_start), 1);
 		if (!data->way && ++status)
 			break ;
 		room = create_ants(data);

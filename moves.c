@@ -6,7 +6,7 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:48:46 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 05:51:48 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/03/31 07:47:18 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,11 @@ int		move_ants(t_data *data, t_way *way, int i, int ant)
 		room1 = find_room(data, way->queue[i]);
 		room1->ants--;
 		room2->ants++;
-		if (data->u_color && room1->index == data->index_start)
-			ft_putstr("\033[92m");
-		else if (data->u_color && room2->index == data->index_end)
+		if (data->u_color && room2->index == data->index_end)
 			ft_putstr("\033[91m");
+		else if (data->u_color && room1->index == data->index_start)
+			ft_putstr("\033[92m");
+
 		else if (data->u_color)
 			ft_putstr("\033[93m");
 		ft_printf("L%d-%s ", ant, room2->name);
