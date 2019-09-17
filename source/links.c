@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:42:47 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:32:50 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:10 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 int		links(t_data *data, t_room **r, char *str)
 {

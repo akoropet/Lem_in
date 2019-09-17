@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:34:40 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:43:29 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:02 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 t_room	*find_wave(t_data *data, int step)
 {

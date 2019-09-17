@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:41:51 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:19:18 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:22 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 void	reset_room(t_room **room, char *name, int x, int y)
 {

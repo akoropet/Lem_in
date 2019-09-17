@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/07 22:04:01 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 15:03:02 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:13 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 void	reset(t_data *data)
 {

@@ -6,7 +6,7 @@
 #    By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/02/18 14:52:04 by akoropet          #+#    #+#              #
-#    Updated: 2019/03/07 22:00:14 by akoropet         ###   ########.fr        #
+#    Updated: 2019/04/27 15:12:14 by akoropet         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ SRC =	libft/ft_atoi.c libft/ft_bzero.c libft/ft_isalnum.c libft/ft_isalpha.c \
 		libft/ft_strsplit.c libft/ft_strstr.c libft/ft_strsub.c libft/ft_strtrim.c \
 		libft/ft_tolower.c libft/ft_toupper.c libft/ft_strndup.c libft/ft_strprint.c \
 		libft/ft_itoa_base.c libft/ft_modfl.c libft/ft_pow.c libft/ft_uitoa_base.c\
-		libft/ft_powl.c \
+		libft/ft_powl.c libft/ft_strfjoin.c\
 		get_next_line/get_next_line.c \
 		ft_printf/ft_printf.c ft_printf/width_and_precision.c ft_printf/ap.c \
 		ft_printf/modifier.c ft_printf/flags.c ft_printf/print_type.c ft_printf/print_s.c \
@@ -45,7 +45,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@ar rcs $(NAME) $(OBJ)
-	@echo ">>>lib done<<"
+	@echo "\033[93m>>>lib compiled<<<\033[0m"
 
 %.o : %.c
 	@gcc $(FLAGS) -c -o  $@ $<

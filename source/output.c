@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:47:52 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 09:27:26 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:18 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 void	error(t_data *data, int status)
 {

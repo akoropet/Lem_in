@@ -6,14 +6,14 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/07 21:58:27 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:40:26 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:54:38 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEM_IN_H
 # define LEM_IN_H
 
-# include "./lib/libft/libft.h"
+# include "../lib/libft/libft.h"
 # include <time.h>
 
 typedef struct		s_room

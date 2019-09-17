@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:28:37 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:33:07 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:20 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 int		check_valid(t_data *data, char *str, int i)
 {

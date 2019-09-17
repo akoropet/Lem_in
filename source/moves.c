@@ -6,11 +6,11 @@
 /*   By: akoropet <akoropet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/28 15:48:46 by akoropet          #+#    #+#             */
-/*   Updated: 2019/03/31 16:43:41 by akoropet         ###   ########.fr       */
+/*   Updated: 2019/09/17 18:55:15 by akoropet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem_in.h"
+#include "../include/lem_in.h"
 
 int		ft_go(t_data *data, t_way *w, int i)
 {
